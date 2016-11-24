@@ -1,0 +1,447 @@
+\documentclass[xcolor=dvipsnames, 10pt]{beamer}
+% versión 1.23
+
+
+\setbeamertemplate{footline}{}
+\useinnertheme{rectangles}
+\useoutertheme{infolines}
+
+% % % % % % Reemplazar
+% \begin{itemize} --->  \begin{itemize}\correct
+% \hojados --->  " "
+% \INEchapter ---  \INEchaptercarta
+
+
+
+%llamadas
+\newcommand{\llamada}{$^*$}
+\newcommand{\textollamada}[1]{{\color{color2}\qquad $^*$#1}}
+
+
+
+%Beamer
+\usepackage{default}
+\usecolortheme[named=blue]{structure} 
+\setbeamercolor*{palette tertiary}{fg= white, bg=color3!80!blue!80!white}
+\setbeamercolor*{palette secondary}{bg=blue!80!green!10!white}
+\setbeamercolor*{palette primary}{bg=blue!80!green!20!white}
+\setbeamercolor{frametitle}{fg=black, bg= white}
+\beamertemplatenavigationsymbolsempty
+
+
+\definecolor{color1}{rgb}{0.4,0.4,1}
+\definecolor{color2}{rgb}{0,0.2,0.8}
+\definecolor{color3}{rgb}{0.1,0.4,0.8}
+
+\newcommand{\correct}{\let\olditem\item
+\renewcommand{\item}{\olditem[\color{color3!80!blue!80!white}\fontsize{12pt}{1.4ex}\selectfont$\bullet$]}}
+
+
+
+%Paquetes estándar
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{setspace} 
+\usepackage{xltxtra}
+\usepackage{enumitem}
+\usepackage{fixltx2e}
+
+%Tikz
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+
+
+%If Then Else, definiciones libres de comandos
+\usepackage{xifthen}
+\usepackage{xargs} %varios argumentos opcionales
+
+%Para compilar en XeLaTeX con tildes
+\usepackage{polyglossia}
+\setmainlanguage{spanish}
+
+%Tipo de letra
+\usepackage{fontspec}
+\setsansfont[
+BoldFont = OpenSans-CondBold.ttf ,
+ItalicFont = OpenSans-CondLightItalic.ttf ,
+BoldItalicFont = OpenSans-CondLightItalic.ttf ]{OpenSans-CondLight.ttf}
+\newfontfamily\Bold{Open Sans Condensed Bold}
+
+\newfontfamily\Sans{Open Sans}
+\newfontfamily\SansBold{Open Sans Bold}
+\newfontfamily\Italic{Open Sans Condensed Light Italic}
+\newfontfamily\Logos{Latin Modern Roman}
+
+
+
+% Para tablas
+
+%Tablas de Excel convertidas a LaTeX, y otros aspectos de cuadros
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{colortbl}
+
+\setlength{\arrayrulewidth}{0.8pt}
+\arrayrulecolor{color2}
+
+%Columnas definibles en ancho
+\usepackage{array}
+\newcolumntype{x}[1]{%
+	>{\centering\arraybackslash}p{#1}}%
+
+\newcolumntype{g}[1]{%
+	>{\raggedleft\arraybackslash}p{#1}}%
+
+\newcolumntype{q}[1]{%
+	>{\raggedright\arraybackslash}p{#1}}%
+
+\usepackage[input-decimal-markers={.}, input-ignore={,}, group-separator={,}]{siunitx}
+
+
+
+
+
+
+
+
+%Títulos y subtítulos centrados
+\makeatletter 
+\long\def\beamer@@frametitle[#1]#2{% 
+  \beamer@ifempty{#2}{}{% 
+    \gdef\insertframetitle{\centering{#2\ifnum\beamer@autobreakcount>0\relax{}\space\usebeamertemplate*{frametitle continuation}\fi}}% 
+  \gdef\beamer@frametitle{#2}% 
+  \gdef\beamer@shortframetitle{#1}% 
+}% 
+} 
+\makeatother 
+
+\setbeamerfont{section in head/foot}{size=\scriptsize}
+\setbeamerfont{fix}{size=\tiny}
+
+\newcommand{\fuente}{Estadísticas INE}
+
+\setbeamertemplate{footline}{
+ \leavevmode%
+ \raisebox{0.3cm}{\hbox{ $\!\!$\begin{beamercolorbox}[wd=0.9\paperwidth,ht=0.0ex,dp=0ex,left]{white}%
+       \usebeamerfont{section in head/foot}  $\quad$ {\raisebox{-0.6mm}{Fuente: \fuente}}
+   \end{beamercolorbox}%
+   \begin{beamercolorbox}[wd=0.1\paperwidth,ht=0.0ex,dp=0ex,right]{white}%
+          \usebeamerfont{section in head/foot}  \fontsize{8pt}{1em}\selectfont \raisebox{-0.6mm}{\includegraphics[width=2.1em]{logo.pdf}} $\ \ \ \ $ 
+      \end{beamercolorbox}%
+ }}}
+  
+
+  
+\setbeamertemplate{headline}{
+ \leavevmode%
+  \raisebox{0.5cm}{\hbox{ $\!\!$\begin{beamercolorbox}[wd=0.51\paperwidth,ht=3.30ex,dp=0.9ex,left]{section in head/foot}% 
+       $\quad\vphantom{q}$ { \color{white}\raisebox{0.35mm}{\insertsectionhead}}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=0.51\paperwidth,ht=3.30ex,dp=0.9ex,right]{subsection in head/foot}%
+         {\color{color1}\raisebox{0.35mm}{\insertsubsectionhead}} $\vphantom{q}\qquad$
+  \end{beamercolorbox}%
+  }}}
+
+
+
+
+
+\newcommand{\INEchapter}[4]{%
+{%
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+\usebackgroundtemplate{%             declare it
+			\tikz[overlay,remember picture] \node[opacity=0.1, at=(current page.center)] {\includegraphics[height=1\paperheight,width=1\paperwidth]{back3.pdf}};
+}		
+\begin{frame}
+
+\begin{center}
+$\ $\\[-1.0cm]
+\fontsize{18pt}{1.8ex}\selectfont{\Bold \color{color2} #1}
+\end{center}
+$\ $\\[-1.0cm]
+\fontsize{12pt}{2.5ex}\selectfont
+\begin{center}
+	\begin{tabular}{p{10cm}}
+	\\[-0.9cm]
+	#4	\\ 
+	\end{tabular} 
+\end{center}
+\end{frame}
+}
+\subsection{\fontsize{6.4}{8}\selectfont \color{color3} #1}
+}
+
+
+
+\newcommand{\INEchaptercarta}[2]{%
+{%
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+\usebackgroundtemplate{%             declare it
+			\tikz[overlay,remember picture] \node[opacity=0.1, at=(current page.center)] {
+				\includegraphics[height=\paperheight,width=\paperwidth]{back4.pdf}};
+}
+		
+		\begin{frame}
+			\begin{center}
+				$\ $\\[-1.0cm]
+				\fontsize{18pt}{1.4ex}\selectfont{\Bold \color{color2} #1}
+			\end{center}
+			$\ $\\[-1.0cm]
+			\fontsize{12pt}{1.4ex}\selectfont
+			\begin{center}
+				\begin{tabular}{p{10cm}}
+					\\[-0.9cm]
+					#2	\\ 
+				\end{tabular} 
+			\end{center}
+		\end{frame}
+	}
+	\subsection{\fontsize{6.4}{8}\selectfont \color{blue!80!green!70!white} #1}
+
+\usebackgroundtemplate{ }    %% undeclare it	
+}
+
+
+
+
+\newcommand{\notita}[1]{}
+
+\newcommand{\columna}[9][]{%
+\renewcommand{\fuente}{#8}
+ \begin{frame}
+
+\begin{center}
+$\ $\\[-1.0cm]
+\fontsize{14pt}{1.4ex}\selectfont{\Bold #5}\\[-0.5cm]  \fontsize{10pt}{2em}\selectfont$-$ #6 $-$
+\end{center}
+
+\begin{center}
+$\ $\\[-0.0cm]
+#7
+\end{center}
+$\ $\\[-1.0cm]
+
+  \end{frame}
+
+}
+
+
+
+
+\newcommand{\cajita}[7][]{%
+\renewcommand{\fuente}{#7}
+\begin{frame}
+	
+	\begin{center}
+		$\ $\\[-1.0cm]
+		\fontsize{14pt}{1.4ex}\selectfont{\Bold #4}\\[-0.5cm]  \fontsize{10pt}{2em}\selectfont$-$ #5 $-$
+	\end{center}
+	
+	\begin{center}
+		$\ $\\[-0.4cm]
+		#6
+	\end{center}
+	$\ $\\[-1.0cm]
+	
+\end{frame}
+
+}
+
+
+
+\newcommand{\cajota}[7][]{%
+	\renewcommand{\fuente}{#7}
+	\begin{frame}
+		
+		\begin{center}
+			$\ $\\[-1.0cm]
+			\fontsize{14pt}{1.4ex}\selectfont{\Bold #4}\\[-0.5cm]  \fontsize{10pt}{2em}\selectfont$-$ #5 $-$
+		\end{center}
+		
+		\begin{center}
+			$\ $\\[-0.4cm]
+			#6
+		\end{center}
+		$\ $\\[-1.0cm]
+		
+	\end{frame}
+	
+}
+
+
+
+\newcommand{\diaposimple}[2]{%
+{\setbeamertemplate{footline}{
+	\leavevmode%
+	\raisebox{0.3cm}{\hbox{ $\!\!$\begin{beamercolorbox}[wd=0.9\paperwidth,ht=0.0ex,dp=0ex,left]{white}%
+				\usebeamerfont{section in head/foot}  \fontsize{7pt}{1em}\selectfont $\quad$ 
+			\end{beamercolorbox}%
+			\begin{beamercolorbox}[wd=0.1\paperwidth,ht=0.0ex,dp=0ex,right]{white}%
+				\usebeamerfont{section in head/foot}  \fontsize{8pt}{1em}\selectfont \raisebox{-0.6mm}{\includegraphics[width=2.1em]{logo.pdf}} $\ \ \ \ $ 
+			\end{beamercolorbox}%
+		}}}
+	\begin{frame}
+		
+		\begin{center}
+			$\ $\\[-1.0cm]
+			\fontsize{14pt}{3ex}\selectfont{\Bold #1} 
+		\end{center}
+		
+		\begin{center}
+			$\ $\\[-0.1cm]
+			\fontsize{12pt}{2.8ex}\selectfont 
+			\begin{tabular}{p{0.85\linewidth}}
+			#2	\\ 
+			\end{tabular} 
+			
+		\end{center}
+		$\ $\\[-0.9cm]
+		
+	\end{frame}
+}
+}
+
+
+
+\newcommand{\diapolist}[2]{{%
+	\setbeamertemplate{footline}{
+		\leavevmode%
+		\raisebox{0.3cm}{\hbox{ $\!\!$\begin{beamercolorbox}[wd=0.9\paperwidth,ht=0.0ex,dp=0ex,left]{white}%
+					\usebeamerfont{section in head/foot}  \fontsize{7pt}{1em}\selectfont $\quad$ 
+				\end{beamercolorbox}%
+				\begin{beamercolorbox}[wd=0.1\paperwidth,ht=0.0ex,dp=0ex,right]{white}%
+					\usebeamerfont{section in head/foot}  \fontsize{8pt}{1em}\selectfont \raisebox{-0.6mm}{\includegraphics[width=2.1em]{logo.pdf}} $\ \ \ \ $ 
+				\end{beamercolorbox}%
+			}}}
+	\begin{frame}
+		
+		\begin{center}
+			$\ $\\[-1.0cm]
+			\fontsize{14pt}{3ex}\selectfont{\Bold #1} 
+		\end{center}
+		
+		\begin{center}
+			$\ $\\[-0.6cm]
+			\fontsize{12pt}{2.8ex}\selectfont 	
+			\begin{tabular}{p{0.85\linewidth}}\begin{itemize}
+				\correct
+				#2
+			\end{itemize}\end{tabular}
+		
+		\end{center}
+		$\ $\\[-1.4cm]
+		
+	\end{frame}
+}
+}
+
+
+
+
+
+
+\newcommand{\INEpartecarta}[2]{%
+	{%
+		\setbeamertemplate{headline}{}
+		\setbeamertemplate{footline}{}
+		\usebackgroundtemplate{% declare it
+			\tikz[overlay,remember picture] \node[opacity=0.1, at=(current page.center)] {
+				\includegraphics[height=\paperheight,width=\paperwidth]{arte.jpg}};
+		}
+		
+		\begin{frame}
+			\begin{center}
+				$\ $\\[-1.0cm]
+				\fontsize{18pt}{1.4ex}\selectfont{\Bold \color{color2} #1}
+			\end{center}
+			$\ $\\[-1.0cm]
+			\fontsize{12pt}{1.4ex}\selectfont
+			\begin{center}
+				\begin{tabular}{p{10cm}}
+					\\[-0.9cm]
+					#2	\\ 
+				\end{tabular} 
+			\end{center}
+		\end{frame}
+	}
+	\subsection{\fontsize{6.4}{8}\selectfont\color{blue!80!green!70!white} #1}
+	
+	\usebackgroundtemplate{ }    %% undeclare it	
+}
+
+
+
+
+
+
+
+
+
+
+
+\newcommand{\primeradiapositiva}[4]{
+\title{\textbf{$\ $\\[7mm] \color{blue!80!black}\fontsize{22pt}{3em}\selectfont$\vphantom{\frac{a}{a}}$#1}\\[-0.3cm]}
+\subtitle{$\ $\\[2mm]\color{blue!60!white}\textbf{\Large$\vphantom{\frac{a}{a}}$#2}\\[-0.7cm]}
+\author[\color{blue!60!black}#3]{}
+\institute{\textbf{\Large#3} \\[3mm]  {\large #4}}
+\date{\fontsize{10pt}{1em}\selectfont}
+
+{
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+
+\usebackgroundtemplate{%             declare it
+	\tikz[overlay,remember picture] \node[opacity=0.1, at=(current page.center)] {
+		\includegraphics[height=1\paperheight,width=1\paperwidth]{back4.pdf}};
+}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+}
+\section{\fontsize{6.4}{8}\selectfont #1}
+
+}
+
+
+\newcommand{\muchasgracias}{
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+
+\usebackgroundtemplate{%             declare it
+	\tikz[overlay,remember picture] \node[opacity=0.8, at=(current page.center)] {
+		\includegraphics[height=\paperheight,width=\paperwidth]{back3.pdf}};
+}
+
+		\begin{frame}
+			\begin{center}  
+				$\ $\\[-0.0cm]
+				\fontsize{24pt}{1.4ex}\selectfont{\Bold \color{black} Muchas gracias}
+			\end{center}\transduration{1.2}
+		\end{frame}
+		
+		\begin{frame} \transfade[duration=1.4]
+			\begin{center}  
+				$\ $\\[-1.0cm]
+				\fontsize{24pt}{1.4ex}\selectfont{\Bold \color{black}}
+			\end{center}\transduration{0.0}
+		\end{frame}
+
+		\begin{frame} \transfade[duration=1.4]
+			\begin{center}
+				$\ $\\[-0.0cm]
+				\fontsize{18pt}{1.4ex}\selectfont{\Bold  Visite:\\[3mm] \color{color2} \texttt{www.ine.gob.gt}}
+			\end{center}
+		\end{frame}
+
+}
+
+
+
+
