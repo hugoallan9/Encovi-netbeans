@@ -35,10 +35,15 @@ class Document:
         self.tipo_descriptor = []
         self.incluir_presentacion = []
         self.tabla = ''
+        self.datos_depto = []
 
     def crear_directorio(self):
         try:
             os.makedirs(self.ruta_salida)
+        except OSError:
+            print "El directorio ya existe"
+        try:
+            os.makedirs(os.path.join(self.ruta_salida,'graficasPresentacion'))
         except OSError:
             print "El directorio ya existe"
 
@@ -115,9 +120,9 @@ class Document:
         +'{\\footnotesize Fuente:  Encuesta Nacional de Condiciones de Vida (Encovi) 2014.} }' )
 
     def crear_presentacion_pp(self):
-        print self.ruta_salida,self.titulo_documento + '-Presentacion-plantilla.pptx' 
+        print self.ruta_salida,self.titulo_documento + '-Presentacion-plantilla.pptx'
         self.prs = Presentation(os.path.join( self.ruta_salida,'Presentacion-plantilla.pptx' ))
-        
+
     def terminar_presentacion_pp(self):
         self.prs.save(os.path.join( self.ruta_salida,self.titulo_documento + '-Presentacion.pptx' ))
 
@@ -233,6 +238,18 @@ class Document:
         except OSError:
             print "El directorio ya existe"
 
+    def des_101(self):
+        des = 'El departamento de ' + self.lugar_geografico + ' está ubicado '\
+        + ' en la Región ' + self.datos_depto[2] + ' del país; tiene '\
+        + self.datos_depto[3] + ' municipios de los cuales ' +  self.datos_depto[4] \
+        + ' es la cabecera departamental. \n\n'\
+        +'La superficie, en kilómetros cuadrados, del departamento es de ' + self.datos_depto[5]
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_01.tex'), 'w')
+        archivo.write(des)
+
+
+
+
 
     def des_102(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_02.csv'))
@@ -247,6 +264,16 @@ class Document:
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_02.tex'), 'w')
         archivo.write(des)
 
+    def des_103(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_03.csv'))
+        des = 'Al comparar el número de habitantes del departamento con la población total, resulta que para 2014 el departamento de '\
+        + self.lugar_geografico +  ' representaba el ' +self.formato_bonito(datos[3][1])\
+        + ' de la población de la República. \n\n'\
+        + ' En 2006, el departamento representaba el ' + self.formato_bonito(datos[1][1])\
+        + ' de la población total.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_03.tex'), 'w')
+        archivo.write(des)
+
     def des_104(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_04.csv'))
         des = 'La densidad poblacional relaciona el número de habitantes con el tamaño del territorio donde esta población habita. Normalmente este indicador se expresa en personas por kilómetro cuadrado. \n \n'\
@@ -256,6 +283,17 @@ class Document:
         + self.formato_bonito(datos[1][1]) + ' habitantes por kilómetro cuadrado.'
 
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_04.tex'), 'w')
+        archivo.write(des)
+
+    def des_105(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_05.csv'))
+        des = ' El departamento de ' + self.lugar_geografico + ' está relativamente '\
+        + self.mas_menos(datos[2][1],datos[1][1]) + ' poblado que el territorio nacional\n\n'\
+        + 'Efectivamente, para 2014 la densidad poblacional del departamento era de '\
+        + self.formato_bonito(datos[2][1]) + ' dato ' + self.mayor_menor(datos[2][1],datos[1][1])\
+        + ' que la densidad a nivel nacional, la que se ubicó en ' + self.formato_bonito(datos[1][1])
+
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_05.tex'), 'w')
         archivo.write(des)
 
     def des_106(self):
@@ -275,6 +313,168 @@ class Document:
         + self.lugar_geografico + ' es menor de quince años, mientras que el '\
         + self.formato_bonito(datos[4][1]) + '\\% tiene 65 años o más.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_07.tex'), 'w')
+        archivo.write(des)
+
+    def des_108(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_08.csv'))
+        des = 'Debido a que la población menor de edad requiere de una atención especial por parte del Gobierno, es necesario conocer su magnitud para cada departamento.\n\n'\
+        +' Para 2014 en el departamento de ' + self.lugar_geografico + ' el '\
+        +self.formato_bonito(datos[2][1]) + ' \\% de su población era '\
+        +' que el dato nacional de ' + self.formato_bonito(datos[1][1]) + '\\%'
+
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_08.tex'), 'w')
+        archivo.write(des)
+
+    def des_109(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_09.csv'))
+        des = 'Las personas mayores de 65 años también son más vulnerables debido a que en mucho casos ya no generan ingresos y porque están en mayor riesgo de contraer enfermedades.\n\n'\
+        +'Según los resultados de la Encovi 2014, la proporción de población mayor de 65 años en el departamento de '\
+        +self.lugar_geografico + ' era de ' + self.formato_bonito(datos[2][1])\
+        +'\\%, porcentaje ' + self.mayor_menor(datos[2][1],datos[1][1])\
+        + ' que el dato nacional de ' + self.formato_bonito(datos[1][1]) + '\\%'
+
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_09.tex'), 'w')
+        archivo.write(des)
+
+    def des_110(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_10.csv'))
+        des = 'Una de las mayores riquezas de Guatemala es su diversidad cultural, la cual puede analizarse más a detalle en los departamentos. En el 2006, el '\
+        +self.formato_bonito(datos[1][1]) + '\\% de la población del departamento'\
+        +' se autoidentificaba como indígena (Maya, Xinca o Garífuna) \n\n'\
+        +' Para 2014 este indicador se ubicó en ' + self.formato_bonito(datos[3][1]) + '\\%'
+
+
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_10.tex'), 'w')
+        archivo.write(des)
+
+    def des_111(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_11.csv'))
+        des = 'Guatemala es un país pluricultural, en este sentido la Encovi 2014 muestra que el 38.8\\% de la población a nivel nacional se autoindentifica como perteneciente al pueblo Maya, Xinca o Garífuna. \n\n'\
+        +'Este indicador para el departamento de ' + self.lugar_geografico\
+        +' es ' + self.mayor_menor(datos[2][1],datos[1][1]) + ' que el dato nacional'\
+        +', al ascender a ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_11.tex'), 'w')
+        archivo.write(des)
+
+    def des_112(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_12.csv'))
+        des = 'Guatemala es un país multilingüe. A nivel nacional un 30\\% de la población aprendió a hablar en un idioma distinto al español, según los datos de la Encovi 2014.\n\n'\
+        +' En el departamento de ' + self.lugar_geografico + ', el '\
+        +self.formato_bonito(datos[1][1]) + '\\% de la población aprendió a '\
+        + 'hablar en un idioma maya y el ' + self.formato_bonito(datos[2][1])\
+        + ' restante su idioma materno es el español.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_12.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_113(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_13.csv'))
+        des = 'Debido a que el País es multilingüe, la población que habla un idioma diferente al materno es importante, por la capacidad de comunicación que genera entre los diferentes grupos lingüísticos.\n\n'\
+        +'En el 2014, en el departamento de ' + self.lugar_geografico + ' el '\
+        +self.formato_bonito(datos[3][1]) + '\\%' + ' de la población hablaba '\
+        +' más de un idioma. En el 2006 este indicador ascendía a ' +self.formato_bonito(datos[1][1])
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_13.tex'), 'w')
+        archivo.write(des)
+
+    def des_114(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_14.csv'))
+        des = 'La Encovi 2014 muestra que en el departamento de ' + self.lugar_geografico\
+        +', el porcentaje de personas indígenas que hablan más de un idioma es de '\
+        +self.formato_bonito(datos[1][1]) + '\\%, mientas que esta proporción para '\
+        +' las personas no indígenas es de ' + self.formato_bonito(datos[2][1])\
+        +'\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_14.tex'), 'w')
+        archivo.write(des)
+
+    def des_115(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_15.csv'))
+        des = 'De la población que habla más de un idioma en el departamento de '\
+        + self.lugar_geografico+ ', el '+  self.formato_bonito(datos[1][1])\
+        +'\\% '+'habla un idioma indígena como segundo idioma, el  '+ self.formato_bonito(datos[2][1])\
+        +'\\% ' + ' el español es su segunda lengua y el ' + self.formato_bonito(datos[3][1])\
+        +'\\% habla otro idioma.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_15.tex'), 'w')
+        archivo.write(des)
+
+    def des_116(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_16.csv'))
+        des = 'En el departamento de ' + self.lugar_geografico + ' la proporción'\
+        +' de la población que solo habla el idioma predominante fue de '\
+        +self.formato_bonito(datos[3][1]) + '\\% en el 2014. \n\n'\
+        +' Este indicador se ubicó en ' + self.formato_bonito(datos[1][1]) + '\\%'\
+        +' en 2006.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_16.tex'), 'w')
+        archivo.write(des)
+
+    def des_117(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_17.csv'))
+        des = 'En el departamento de ' + self.lugar_geografico + ' la proporción '\
+        +' de la población que habla el idioma predominante y el español fue de '\
+        +self.formato_bonito(datos[3][1]) + '\\% en el 2014.\n\n'\
+        +' En indicador se ubicó en ' + self.formato_bonito(datos[1][1]) + '\\%'\
+        +' en 2006.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_17.tex'), 'w')
+        archivo.write(des)
+
+    def des_118(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_18.csv'))
+        des = 'La Encovi 2014 establece que en 2014 el 49.5\\% de la población'\
+        +' a nivel nacional habita en áreas urbanas.\n\n'\
+        +' En el departamento de ' + self.lugar_geografico + ' este porcentaje es '\
+        +self.mayor_menor(datos[2][1],datos[1][1]) + ' que el dato nacional al '\
+        +' ubicarse en ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_18.tex'), 'w')
+        archivo.write(des)
+
+    def des_119(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_19.csv'))
+        des = 'Es interesante conocer la proporción que habita en áreas urbanas atendiendo al grupo étnico.\n\n'\
+        +' Según la Encovi 2014, el ' + self.formato_bonito(datos[1][1]) + '\\% '\
+        +' de la población indígena del departamento de ' + self.lugar_geografico\
+        +' habita en áreas urbanas; para la población no indígena la proporción '\
+        +' de habitantes en áreas urbanas asciende a ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_19.tex'), 'w')
+        archivo.write(des)
+
+    def des_120(self):
+        datos1 = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_18.csv'))
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_20.csv'))
+        des = 'Como se mencionó anteriormente, en el departamento de '\
+        + self.lugar_geografico + ' el ' + self.formato_bonito(datos1[2][1])\
+        +'\\% de la población habita en áreas urbanas. \n\n'\
+        +'Este dato es ' + self.mayor_menor(datos[3][1],datos[1][1]) + ' que el '\
+        +'observado en la Encovi de 2006, en la que el indicador se ubicó en '\
+        +self.formato_bonito(datos[1][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_20.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_121(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_21.csv'))
+        des = 'El Documento Personal de Identificación (DPI) es necesario para llevar a cabo una serie de gestiones en el ámbito personal, comercial e institucional. A nivel nacional el 96.4\\% de la población mayor de edad tenía DPI en el 2014.\n\n'\
+        +'Para el departamento de ' + self.lugar_geografico + ' este porcentaje se ubicó en '\
+        +self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_21.tex'), 'w')
+        archivo.write(des)
+
+    def des_122(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_22.csv'))
+        des = 'Por sexo, el ' + self.formato_bonito(datos[1][1]) + '\\% de los hombres '\
+        +' del departamento de ' + self.lugar_geografico + ' tenían DPI en el 2014, '\
+        +'dato ligeramente ' + self.mayor_menor(datos[1][1],datos[2][1]) + ' que el'\
+        +' de las mujeres que se ubicó en ' +  self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_22.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_123(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','1_23.csv'))
+        des = 'En cuanto al área de residencia, el ' + self.formato_bonito(datos[1][1])\
+        +'\\% de los habitantes mayores de edad de las áreas urbanas del departamento '\
+        +' de ' + self.lugar_geografico + ' tenían DPI en el 2014, dato '\
+        +self.mayor_menor(datos[1][1],datos[2][1]) + ' al de las áreas rurales '\
+        +' que se ubicó en ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_23.tex'), 'w')
         archivo.write(des)
 
     def des_201(self):
@@ -499,6 +699,12 @@ class Document:
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_05.tex'), 'w')
         archivo.write(des)
 
+    def mas_menos(self,dato1, dato2):
+        if float(dato1) > float(dato2):
+            return 'más'
+        else:
+            return 'menos'
+
 
     def alto_bajo(self,dato1, dato2):
         if float(dato1) > float(dato2):
@@ -558,10 +764,29 @@ class Document:
             return ' igual '
 
     def escribir_descripciones(self):
+        self.des_101()
         self.des_102()
+        self.des_103()
         self.des_104()
+        self.des_105()
         self.des_106()
         self.des_107()
+        self.des_108()
+        self.des_109()
+        self.des_110()
+        self.des_111()
+        self.des_112()
+        self.des_113()
+        self.des_114()
+        self.des_115()
+        self.des_116()
+        self.des_117()
+        self.des_118()
+        self.des_119()
+        self.des_120()
+        self.des_121()
+        self.des_122()
+        self.des_123()
         self.des_201()
         self.des_203()
         self.des_205()

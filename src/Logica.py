@@ -38,11 +38,13 @@ class Manejador:
         'Jalapa',
         'Jutiapa'
         ]
+        self.datos_deptos = []
         self.documentos = []
         self.crear_documentos()
         self.crear_carpetas()
         self.leer_libro()
         self.leer_tabla()
+        self.leer_libro_deptos()
         self.empezar_documentos()
         self.rellenar_documentos()
 
@@ -98,6 +100,24 @@ class Manejador:
                             self.documentos[x].tabla = self.documentos[x].tabla + '\\Bold{ '  + valor + '}'
                 print self.documentos[x].tabla
 
+    def leer_libro_deptos(self):
+        wb = load_workbook(filename = 'datos_deptos.xlsx')
+        sheet_ranges = wb['Hoja1']
+        fila = 0
+        valor = ''
+        retorno = []
+        datos_filas = []
+        for row in sheet_ranges:
+            datos_filas = []
+            for cell in row:
+                try:
+                    valor = cell.value.encode('utf-8')
+                except:
+                    valor = self.documentos[0].formato_bonito(cell.value)
+                datos_filas.append(valor)
+            retorno.append(datos_filas)
+        for x in range(0,22):
+            self.documentos[x].datos_depto = retorno[x]
 
     def leer_libro(self):
         wb = load_workbook(filename = 'Contenido_Encovi_Departamentales.xlsx')
@@ -161,8 +181,9 @@ class Manejador:
         for x in range(0,22):
             self.documentos[x].capitulos.pop(0)
             contador_capitulos = self.documentos[x].no_capitulos[1]
+            titulo = self.documentos[x].capitulos.pop(0)
             capitulo = self.documentos[x].crear_capitulo(
-                self.documentos[x].capitulos.pop(0),
+                titulo,
                 ""
                 )
             self.documentos[x].escribir_en_doc(capitulo)
@@ -200,6 +221,12 @@ class Manejador:
                     subtitle = slide.placeholders[13]
                     title.text = self.documentos[x].titulo_grafica[y]
                     subtitle.text = self.documentos[x].desagregacion_grafica[y]
+                    cap = slide.placeholders[17]
+                    cap.text = titulo
+                    subsection = slide.placeholders[16]
+                    subsection.text = self.documentos[x].titulo_seccion[y]
+                    grafica = slide.placeholders[14]
+                    grafica.insert_picture('/home/hugo/Documents/Departamentos/Guatemala/1_06-1.png')
                     for shape in slide.placeholders:
                         print('%d %s' % (shape.placeholder_format.idx, shape.name))
                     self.documentos[x].escribir_en_presentacion(caja)
@@ -207,9 +234,8 @@ class Manejador:
             self.documentos[x].terminar_documento()
             self.documentos[x].terminar_presentacion()
             self.documentos[x].terminar_presentacion_pp()
-#            self.documentos[x].compilar_documento()
-#            self.documentos[x].compilar_documento()
-#            self.documentos[x].compilar_presentacion()
-#            self.documentos[x].compilar_presentacion()
+            self.documentos[x].compilar_documento()
+            self.documentos[x].compilar_documento()
+            self.documentos[x].compilar_presentacion()
+            self.documentos[x].compilar_presentacion()
 #            self.documentos[x].limpiar_directorio()
-            
