@@ -7,7 +7,7 @@ __author__ = "hugo"
 __date__ = "$23/11/2016 04:42:04 PM$"
 
 
-import os
+import glob, os
 import shutil as sh
 import subprocess
 import time
@@ -16,6 +16,7 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.util import Pt
+
 
 class Document:
 
@@ -122,6 +123,21 @@ class Document:
     def crear_presentacion_pp(self):
         print self.ruta_salida,self.titulo_documento + '-Presentacion-plantilla.pptx'
         self.prs = Presentation(os.path.join( self.ruta_salida,'Presentacion-plantilla.pptx' ))
+        title_slide_layout = self.prs.slide_layouts[0]
+        slide = self.prs.slides.add_slide(title_slide_layout)
+        title = slide.shapes.title
+        title.text = 'Resultados ENCOVI 2014'
+        subtitle = slide.placeholders[1]
+        subtitle.text = 'Participación ciudadana y medios de comunicación \n ' + self.lugar_geografico+', noviembre 2016\n'
+        title_slide_layout = self.prs.slide_layouts[3]
+        slide = self.prs.slides.add_slide(title_slide_layout)
+        title = slide.shapes.title
+        title.text = 'Objetivo General de Encovi'
+        subtitle = slide.placeholders[10]
+        subtitle.text = 'Conocer y evaluar las condiciones de vida de la población '\
+        +' y determinar los niveles de pobreza existentes en Guatemala.'
+        for shape in slide.placeholders:
+            print('%d %s' % (shape.placeholder_format.idx, shape.name))
 
     def terminar_presentacion_pp(self):
         self.prs.save(os.path.join( self.ruta_salida,self.titulo_documento + '-Presentacion.pptx' ))
@@ -179,6 +195,20 @@ class Document:
         cadena_compilacion = "cd "+ self.ruta_compilacion + " && xelatex " + self.titulo_documento.strip().replace(" ", "\\ ") + ".tex"
         print cadena_compilacion
         print subprocess.Popen(cadena_compilacion, shell=True, stdout=subprocess.PIPE).stdout.read()
+
+    def compilar_graficas(self):
+        os.chdir( os.path.join(self.ruta_salida,'graficasPresentacion'))
+        for file in glob.glob('*.tex'):
+            cadena_compilacion = "cd "+ os.path.join(self.ruta_compilacion,'graficasPresentacion')+ " && xelatex " + file
+            print cadena_compilacion
+            print subprocess.Popen(cadena_compilacion, shell=True, stdout=subprocess.PIPE).stdout.read()
+        os.chdir( os.path.join(self.ruta_salida,'graficasPresentacion'))
+        for file in glob.glob('*.pdf'):
+            cadena_compilacion = "cd "+ os.path.join(self.ruta_compilacion,'graficasPresentacion')+ " && convert -density 300 -quality 100  " + file + ' ' + os.path.splitext(file)[0] + '.png'
+            print cadena_compilacion
+            print subprocess.Popen(cadena_compilacion, shell=True, stdout=subprocess.PIPE).stdout.read()
+
+
 
     def compilar_presentacion(self):
         cadena_compilacion = "cd "+ self.ruta_compilacion + " && xelatex " + self.titulo_documento.strip().replace(" ", "\\ ") + "-Presentacion.tex"
@@ -488,6 +518,17 @@ class Document:
         archivo.write(des)
 
 
+    def des_202(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_02.csv'))
+        des = 'La Encovi 2014 establece que, a nivel nacional, el 27.5\\% de hogares habita en una vivienda con piso de tierra.\n\n'\
+        +'Este porcentaje para el departamento de ' + self.lugar_geografico\
+        +' es ' + self.mayor_menor(datos[2][1],datos[1][1]) + ' que el dato '\
+        +'a nivel nacional y se ubica en ' + self.formato_bonito(datos[2][1])
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_02.tex'), 'w')
+        archivo.write(des)
+
+
+
     def des_203(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_03.csv'))
         des = 'El material del techo también es un aspecto relevante para determinar las condiciones de vida de un hogar. Un techo de mala calidad no brinda el suficiente resguardo para las inclemencias del tiempo, lo cual puede incidir en una mayor prevalencia de enfermedades respiratorias. \n\n' \
@@ -496,6 +537,19 @@ class Document:
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_03.tex'), 'w')
         archivo.write(des)
 
+
+    def des_204(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_04.csv'))
+        des = 'A nivel nacional, el 72.3\\% de hogares habita en una vivienda con techo de lámina,'\
+        +' según la Encovi 2014.\n\n'\
+        +'Para el caso del departamento de ' + self.lugar_geografico + ', el porcentaje '\
+        +' de hogares con este tipo de material en el techo es ' + self.mayor_menor(datos[2][1],datos[1][1])\
+        +' que el valor del dato nacional, al ubicarse en ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_04.tex'), 'w')
+        archivo.write(des)
+
+
+
     def des_205(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_05.csv'))
         des = 'Se sabe que hay algunas enfermedades cuyos vectores se reproducen más fácilmente en cierto tipo de paredes, como el mal de Chagas; por ello es relevante investigar acerca del tipo de material de las paredes en el que habitan los hogares. \n\n'\
@@ -503,6 +557,129 @@ class Document:
         +self.lugar_geografico + ' habitaban una casa con paredes de block, '\
         +self.especial1(datos[4][1])
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_05.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_206(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_06.csv'))
+        des = 'Los hogares que habitan en viviendas con paredes de block representaban el 58.2\\% del total de hogares en 2014.\n\n'\
+        +'En el departamento de ' + self.lugar_geografico + ', el porcentaje de hogares que '\
+        +' habitan viviendas con paredes de block ascendía a ' + self.formato_bonito(datos[2][1])\
+        +'\\% para ese mismo año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_06.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_207(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_07.csv'))
+        des = 'Tener acceso a una de red de agua es muy importante para la salud de los miembros de un hogar.\n\n'\
+        +' En el 2014, el ' + self.formato_bonito(datos[3][1]) +'\\% '\
+        +' de hogares del departamento de ' + self.lugar_geografico + ' estaban '\
+        +' conectados a una red de agua; en 2006 este porcentaje era de '\
+        +self.formato_bonito(datos[1][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_07.tex'), 'w')
+        archivo.write(des)
+
+    def des_208(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_08.csv'))
+        des = 'Al igual que la red de agua, el acceso a una red de drenajes también es esencial para la higiene y saneamiento de un hogar.\n\n'\
+        +' Según la Encovi 2014, el ' + self.formato_bonito(datos[3][1])\
+        +'\\% de hogares del departamento de ' + self.lugar_geografico\
+        +' estaban conectados a una red de drenajes; en 2006 este porcentaje '\
+        +'ascendía a ' + self.formato_bonito(datos[1][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_08.tex'), 'w')
+        archivo.write(des)
+
+    def des_209(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_09.csv'))
+        des = 'Para el caso del acceso a una red de energía eléctrica, la Encovi 2014'\
+        +' muestra que el ' + self.formato_bonito(datos[3][1]) + '\\% de los hogares '\
+        +' del departamento de ' + self.lugar_geografico + ' estaban conectados a '\
+        +' este tipo de red. \n\n ' + ' El porcentaje para el año 2006 se ubicaba en '\
+        + self.formato_bonito(datos[1][1]) + '\\%, según la misma fuente de información.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_09.tex'), 'w')
+        archivo.write(des)
+
+    def des_210(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_10.csv'))
+        des = 'En el departamento de ' + self.lugar_geografico + ' el porcentaje '\
+        +' de hogares que tenían automóvil ascendía a ' + self.formato_bonito(datos[2][1])\
+        +'\\%, porcentaje ' + self.mayor_menor(datos[2][1], datos[1][1]) + ' al '\
+        +'reportado a nivel nacional. '
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_10.tex'), 'w')
+        archivo.write(des)
+
+    def des_211(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_11.csv'))
+        des = 'En cuanto a los hogares con televisión, en  el departamento de ' + self.lugar_geografico + ' el porcentaje '\
+        +' el porcentaje de hogares que contaban con este artículo era de  ' + self.formato_bonito(datos[2][1])\
+        +'\\%, indicador ' + self.mayor_menor(datos[2][1], datos[1][1]) + ' al '\
+        +'reportado a nivel nacional. '
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_11.tex'), 'w')
+        archivo.write(des)
+
+    def des_212(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_12.csv'))
+        des = 'En el departamento de ' + self.lugar_geografico + ' el porcentaje '\
+        +' de hogares que contaban con refrigeradora era de  ' + self.formato_bonito(datos[2][1])\
+        +'\\%, porcentaje ' + self.mayor_menor(datos[2][1], datos[1][1]) + ' al '\
+        +'reportado a nivel nacional. '
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_12.tex'), 'w')
+        archivo.write(des)
+
+    def des_213(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_13.csv'))
+        des = 'En el año 2006, el  ' + self.formato_bonito(datos[3][1]) + ' \\% '\
+        +' de hogares en el departamento  de ' + self.lugar_geografico + ' eran '\
+        +' nucleares, es decir, estaban compuestos por padres e hijos únicamente; '\
+        ' en el otro extremo el ' + self.formato_bonito(datos[1][1]) + '\\% de '\
+        +' hogares tenían un único miembro (unipersonales).\n\n'\
+        +' Para el caso de los hogares conformados solamente por la pareja (sin hijos)'\
+        + ', estos representaban el ' + self.formato_bonito(datos[2][1]) + '\\%.'
+
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_13.tex'), 'w')
+        archivo.write(des)
+
+    def des_214(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_14.csv'))
+        des = 'La Encovi 2014 establece que el '+ self.formato_bonito(datos[3][1])\
+        +'\\% de hogares en el departamento de ' + self.lugar_geografico + ' eran nucleares, el '\
+        + self.formato_bonito(datos[1][1]) + '\\% tenían un único miembro y el '\
+        +self.formato_bonito(datos[2][1])+ '\\% estaban conformados por una pareja.\n\n'\
+        +'Para este año, los hogares biparentales extensos (que además de los hijos tenían otros parientes viviendo en el hogar) '\
+        +' representaban el ' + self.formato_bonito(datos[4][1]) + '\\%.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_14.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_215(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_15.csv'))
+        des = 'En el departamento de ' + self.lugar_geografico + ' el porcentaje '\
+        +' de hogares con jefatura femenia e hijos era de ' + self.formato_bonito(datos[2][1])\
+        + '\\%. \n\n' + ' Este indicador en 2006 ascendía a ' + self.formato_bonito(datos[1][1])\
+        + '\\% según la Encovi de ese año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_15.tex'), 'w')
+        archivo.write(des)
+
+    def des_216(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_16.csv'))
+        des = 'En el 2014 en el departamento de '+ self.lugar_geografico + ' el '\
+        +' porcentaje de hogares con jefatura femenina y en los que también habitaban '\
+        +' parientes era de ' + self.formato_bonito(datos[2][1]) + '\\%.\n\n'\
+        +'Este indicador en 2006 ascendía a ' + self.formato_bonito(datos[1][1])\
+        +'\\%, según la Encovi de ese año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_16.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_217(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_17.csv'))
+        des = 'El tamaño de un hogar es una variable demográfica relevante. Por ejemplo, este indicador es útil para el diseño de soluciones habitacionales que se ajusten a las necesidades de las familias.\n\n'\
+        +'Según los datos de la Encovi, en 2014 los hogares del departamento  de '\
+        + self.lugar_geografico + ' tenían en promedio ' + self.formato_bonito(datos[3][1])\
+        + ' miembros, dato ' + self.mayor_menor(datos[3][1], datos[1][1])\
+        +' a los ' + self.formato_bonito(datos[1][1]) + ' habitantes promedio por hogar del año 2006.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_17.tex'), 'w')
         archivo.write(des)
 
     def des_218(self):
@@ -561,6 +738,26 @@ class Document:
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_04.tex'), 'w')
         archivo.write(des)
 
+    def des_605(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_05.csv'))
+        des = ' En el departamento de, el '+ self.formato_bonito(datos[1][1]) +'\\% '\
+        +' de la población que se autoidentificaba como indígena tenía un consumo '\
+        +'por dejbajo de la línea de pobreza total. \n\n '\
+        +'Para el caso de la población no indígena, el porecentaje de pobreza '\
+        +' total fue de '+ self.formato_bonito(datos[2][1]) + '\\% en 2014.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_05.tex'), 'w')
+        archivo.write(des)
+
+    def des_606(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_06.csv'))
+        des = ' A nivel nacional, el 68.2\\% de la población menor de edad se encontraba en nivel de pobreza en el año 2014, según los dato de la Encovi.\n\n'\
+        +' Para el departamento de ' + self.lugar_geografico + ', este indicador está por '\
+        + self.encima_debajo(datos[2][1],datos[1][1]) + ' del dato nacional ya que '\
+        +' asciende a ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_06.tex'), 'w')
+        archivo.write(des)
+
+
     def des_607(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_07.csv'))
         des = ' Para el año 2006, el valor de la línea de pobreza extrema era de Q 3,206. Es importante recordar que la línea de pobreza extrema representa el costo de adquirir la cantidad de calorías mínimas recomendadas para un humano. \n\n'\
@@ -597,6 +794,35 @@ class Document:
         +'\\% y en el área urbana en' + self.formato_bonito(datos[1][1]) + '\\%, según la información de la Encovi 2014.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_10.tex'), 'w')
         archivo.write(des)
+
+    def des_611(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_11.csv'))
+        des = 'El ' + self.formato_bonito(datos[1][1]) + '\\% de la población '\
+        +' indígena del departamento de '+ self.lugar_geografico + ' estaba con '\
+        +' condición de pobreza extrema en el 2014.\n\n'\
+        +'Para el caso del la población no indígena, la indicencia de pobreza extrema '\
+        +' fue de ' + self.formato_bonito(datos[2][1])+ '\\% para ese mismo año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_11.tex'), 'w')
+        archivo.write(des)
+
+    def des_612(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_12.csv'))
+        des = 'A nivel nacional, el 29.0\\% de la población menor de edad se encontraba en nivel de pobreza extrema en el año 2014, según los dato de la Encovi.\n\n'\
+        +'Para el departamento de ' + self.lugar_geografico +', este indicador está por '\
+        +self.encima_debajo(datos[2][1], datos[1][1]) + ' del dato nacional, al ubicarse en '\
+        +self.formato_bonito(datos[2][1]) + '\\%.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_12.tex'), 'w')
+        archivo.write(des)
+
+    def des_613(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_13.csv'))
+        des = 'A nivel nacional, el índice de severidad de la pobreza se ubicó en 10.6\\% en el 2014 según los datos de la Encovi.\n\n'\
+        +' Para el caso del departamento de ' + self.lugar_geografico + ', este indicador '\
+        +' estuvo por ' + self.encima_debajo(datos[2][1],datos[1][1])\
+        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1]) + '\\%'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_13.tex'), 'w')
+        archivo.write(des)
+
 
     def des_301(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','3_01.csv'))
@@ -763,6 +989,14 @@ class Document:
         else:
             return ' igual '
 
+    def encima_debajo(self,dato1,dato2):
+        if dato1 > dato2:
+            return ' encima '
+        elif(dato1 < dato2):
+            return ' debajo '
+        else:
+            return ' igual '
+
     def escribir_descripciones(self):
         self.des_101()
         self.des_102()
@@ -788,16 +1022,37 @@ class Document:
         self.des_122()
         self.des_123()
         self.des_201()
+        self.des_202()
         self.des_203()
+        self.des_204()
         self.des_205()
+        self.des_206()
+        self.des_207()
+        self.des_208()
+        self.des_209()
+        self.des_210()
+        self.des_211()
+        self.des_212()
+        self.des_213()
+        self.des_214()
+        self.des_215()
+        self.des_216()
+        self.des_217()
         self.des_218()
         self.des_219()
         self.des_601()
         self.des_602()
         self.des_603()
         self.des_604()
+        self.des_605()
+        self.des_606()
+        self.des_607()
         self.des_608()
+        self.des_609()
         self.des_610()
+        self.des_611()
+        self.des_612()
+        self.des_613()
         self.des_301()
         self.des_302()
         self.des_303()

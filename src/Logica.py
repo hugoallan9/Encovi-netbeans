@@ -38,6 +38,19 @@ class Manejador:
         'Jalapa',
         'Jutiapa'
         ]
+        self.mono_indigenas = ['Chimaltenango',
+        'Sololá',
+        'Totonicapán',
+        'Quetzaltenango',
+        'Suchitepéquez',
+        'San Marcos',
+        'Huehuetenango',
+        'Quiché',
+        'Baja Verapaz',
+        'Alta Verapaz',
+        'Petén',
+        'Izabal'
+        ]
         self.datos_deptos = []
         self.documentos = []
         self.crear_documentos()
@@ -71,6 +84,7 @@ class Manejador:
             self.documentos[x].crear_documento()
             self.documentos[x].crear_presentacion()
             self.documentos[x].crear_presentacion_pp()
+            self.documentos[x].compilar_graficas()
 
     def leer_tabla(self):
         wb = load_workbook(filename = 'tabla.xlsx')
@@ -188,6 +202,10 @@ class Manejador:
                 )
             self.documentos[x].escribir_en_doc(capitulo)
             self.documentos[x].escribir_en_presentacion(capitulo)
+            title_slide_layout = self.documentos[x].prs.slide_layouts[2]
+            slide =  self.documentos[x].prs.slides.add_slide(title_slide_layout)
+            title = slide.shapes.title
+            title.text  = titulo
             contador_secciones = 1
             for y in range(1,len(self.documentos[x].no_capitulos) ):
                 if self.documentos[x].no_capitulos[y] != contador_capitulos:
@@ -202,6 +220,10 @@ class Manejador:
                     ""
                     )
                     self.documentos[x].escribir_en_presentacion(capitulo)
+                    title_slide_layout = self.documentos[x].prs.slide_layouts[2]
+                    slide =  self.documentos[x].prs.slides.add_slide(title_slide_layout)
+                    title = slide.shapes.title
+                    title.text  = titulo
                     contador_secciones = 1
                 contador_capitulos = self.documentos[x].no_capitulos[y]
                 caja = self.documentos[x].crear_cajita(
@@ -212,8 +234,16 @@ class Manejador:
                 self.documentos[x].crear_cadena_descriptor(str(contador_capitulos) + '_' + self.formatear_secciones(contador_secciones), self.documentos[x].tipo_descriptor[y]),
                 'INE'
                     )
-                contador_secciones = contador_secciones + 1
-                self.documentos[x].escribir_en_doc(caja)
+                if self.documentos[x].lugar_geografico in self.mono_indigenas:
+                    self.documentos[x].escribir_en_doc(caja)
+                else:
+                    if contador_capitulos != 1:
+                        self.documentos[x].escribir_en_doc(caja)
+                    elif contador_secciones == 16 or contador_secciones == 17:
+                        pass
+                    else:
+                        self.documentos[x].escribir_en_doc(caja)
+
                 if self.documentos[x].incluir_presentacion[y] == '*':
                     title_slide_layout = self.documentos[x].prs.slide_layouts[1]
                     slide =  self.documentos[x].prs.slides.add_slide(title_slide_layout)
@@ -226,10 +256,11 @@ class Manejador:
                     subsection = slide.placeholders[16]
                     subsection.text = self.documentos[x].titulo_seccion[y]
                     grafica = slide.placeholders[14]
-                    grafica.insert_picture('/home/hugo/Documents/Departamentos/Guatemala/1_06-1.png')
+                    grafica.insert_picture(os.path.join('/home/hugo/Documents/Departamentos/', self.documentos[x].lugar_geografico, 'graficasPresentacion',  str(contador_capitulos) + '_' + self.formatear_secciones(contador_secciones) + '.png') )
                     for shape in slide.placeholders:
                         print('%d %s' % (shape.placeholder_format.idx, shape.name))
                     self.documentos[x].escribir_en_presentacion(caja)
+                contador_secciones = contador_secciones + 1
             self.documentos[x].escribir_descripciones()
             self.documentos[x].terminar_documento()
             self.documentos[x].terminar_presentacion()
