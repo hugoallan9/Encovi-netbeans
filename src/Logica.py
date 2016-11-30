@@ -82,6 +82,7 @@ class Manejador:
     def empezar_documentos(self):
         for x in range(0,22):
             self.documentos[x].crear_documento()
+            self.documentos[x].crear_caratula()
             self.documentos[x].crear_presentacion()
             self.documentos[x].crear_presentacion_pp()
             #self.documentos[x].compilar_graficas()

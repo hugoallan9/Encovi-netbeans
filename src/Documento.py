@@ -83,10 +83,21 @@ class Document:
         self.documento.write( '\\definecolor{color1}{rgb}{0,0,0.8} \n' +
         '\\definecolor{color2}{rgb}{0.3,0.5,1} \n' )
         self.documento.write('\\begin{document} \n' )
+        self.documento.write('\\includepdf{caratula.pdf}')
         self.documento.write('\input{participantes.tex}\n')
         self.documento.write('\\tableofcontents')
         self.documento.write('\pagestyle{estandar}\n')
         self.documento.write('\setcounter{page}{0}\n')
+
+    def crear_caratula(self):
+        self.ruta_compilacion = self.ruta_salida.strip().replace(" ", "\\ ")
+        documento = open( os.path.join( self.ruta_salida,
+        'depto.tex' ), 'w+' )
+        documento.write('Departamento de ' + self.lugar_geografico)
+        documento.close()
+        cadena_compilacion = "cd "+ self.ruta_compilacion + " && xelatex " + "caratula.tex"
+        print cadena_compilacion
+        print subprocess.Popen(cadena_compilacion, shell=True, stdout=subprocess.PIPE).stdout.read()
 
     def limpiar_directorio(self):
         for f in os.listdir(self.ruta_salida):
@@ -143,6 +154,22 @@ class Document:
         subtitle = slide.placeholders[10]
         subtitle.text = 'Conocer y evaluar las condiciones de vida de la población '\
         +' y determinar los niveles de pobreza existentes en Guatemala.'
+        title_slide_layout = self.prs.slide_layouts[3]
+        slide = self.prs.slides.add_slide(title_slide_layout)
+        shapes = slide.shapes
+        title = slide.shapes.title
+        title.text = 'Objetivos específicos de Encovi'
+        body_shape = shapes.placeholders[10]
+        tf = body_shape.text_frame
+        p = tf.add_paragraph()
+        p.text =  'Contar con información confiable y oportuna que permita identificar las condiciones de vida de los distintos grupos sociales del país, especialmente en la estructura de los ingresos y gastos del hogar, que faciliten la elaboración y evaluación de planes, políticas y estrategias de desarrollo.'
+        p.level = 1
+        p = tf.add_paragraph()
+        p.text = 'Obtener estimaciones de la tasa de pobreza y pobreza extrema para cada uno de los dominios de estudio de esta encuesta. '
+        p.level = 1
+        p = tf.add_paragraph()
+        p.text  = 'Monitorear los avances e impactos de los programas y acciones sociales. '
+        p.level = 1
         for shape in slide.placeholders:
             print('%d %s' % (shape.placeholder_format.idx, shape.name))
 
@@ -827,7 +854,7 @@ class Document:
         des = 'A nivel nacional, el índice de Gini para medir la desigualdad se ubicó en 0.53 en el 2014 según los datos de la Encovi.\n\n'\
         +' Para el caso del departamento de ' + self.lugar_geografico + ', este indicador '\
         +' estuvo por ' + self.encima_debajo(datos[2][1],datos[1][1])\
-        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1]) 
+        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1])
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_13.tex'), 'w')
         archivo.write(des)
 

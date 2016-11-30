@@ -1,0 +1,31 @@
+\documentclass[11pt,twoside]{book}\usepackage[T1]{fontenc}
+\usepackage{tikz}
+
+\usepackage[active,tightpage,xetex]{preview}
+
+\usepackage{fontspec,xunicode}
+
+\PreviewEnvironment{pgfpicture}
+
+\setlength\PreviewBorder{0pt}
+
+\usetikzlibrary{calc}
+
+\usetikzlibrary{positioning}
+
+\usepackage{fontspec,xunicode}
+
+\setmainfont{FuturaStd-CondensedLight.otf}
+\begin{document}
+
+\begin{tikzpicture} 
+ \node[anchor=south west,inner sep=0] (image) at (0,0) {\includegraphics{portada}};
+\begin{scope}[x={(image.south east)},y={(image.north west)}] \node[inner sep =0, scale = 3.8, align = left, color = white] at (0.49,0.53) {
+\input{depto.tex} 
+		\\
+Resultados de Encovi 2014 \\
+ };\node[inner sep =0, scale =2, color = white]at(0.54,0.05){Guatemala, noviembre de 2016};
+ \end{scope}
+\end{tikzpicture}
+
+\end{document}
