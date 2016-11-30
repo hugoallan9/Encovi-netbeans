@@ -16,7 +16,7 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.util import Pt
-
+import unicodedata
 
 class Document:
 
@@ -24,6 +24,10 @@ class Document:
         self.titulo_documento = tituloDoc
         self.lugar_geografico = lugar_geografico
         self.ruta_salida = ruta_salida
+        self.ruta_salida = unicode(self.ruta_salida, 'utf8')
+        self.ruta_salida = unicodedata.normalize("NFKD", self.ruta_salida)
+        self.ruta_salida = self.ruta_salida.encode("ascii", "ignore")
+        print self.ruta_salida
         self.anio_evento = anio
         self.no_capitulos = []
         self.capitulos = []
@@ -39,6 +43,7 @@ class Document:
         self.datos_depto = []
 
     def crear_directorio(self):
+
         try:
             os.makedirs(self.ruta_salida)
         except OSError:
@@ -78,8 +83,10 @@ class Document:
         self.documento.write( '\\definecolor{color1}{rgb}{0,0,0.8} \n' +
         '\\definecolor{color2}{rgb}{0.3,0.5,1} \n' )
         self.documento.write('\\begin{document} \n' )
+        self.documento.write('\input{participantes.tex}\n')
         self.documento.write('\\tableofcontents')
-
+        self.documento.write('\pagestyle{estandar}\n')
+        self.documento.write('\setcounter{page}{0}\n')
 
     def limpiar_directorio(self):
         for f in os.listdir(self.ruta_salida):
@@ -181,6 +188,7 @@ class Document:
         self.presentacion.write( '\n \n ' + texto + '\n \n' )
 
     def terminar_documento(self):
+        self.escribir_en_doc('\\input{metodologia.tex}\n'.encode('utf-8'))
         self.escribir_en_doc('\\end{document}'.encode('utf-8'))
         self.documento.close()
 
@@ -740,9 +748,9 @@ class Document:
 
     def des_605(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_05.csv'))
-        des = ' En el departamento de, el '+ self.formato_bonito(datos[1][1]) +'\\% '\
+        des = ' En el departamento de ' + self.lugar_geografico + ' el '+ self.formato_bonito(datos[1][1]) +'\\% '\
         +' de la población que se autoidentificaba como indígena tenía un consumo '\
-        +'por dejbajo de la línea de pobreza total. \n\n '\
+        +'por debajo de la línea de pobreza total. \n\n '\
         +'Para el caso de la población no indígena, el porecentaje de pobreza '\
         +' total fue de '+ self.formato_bonito(datos[2][1]) + '\\% en 2014.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_05.tex'), 'w')
@@ -791,7 +799,7 @@ class Document:
         des = 'En 2014, el 11.2\\% de la población urbana estaba en pobreza extrema; para el caso de la población rural, este indicador se ubicó en 35.3\\%.\n\n'\
         +'Para el departamento de ' + self.lugar_geografico \
         +', la pobreza extrema en el área rural se ubicó en ' + self.formato_bonito(datos[2][1]) \
-        +'\\% y en el área urbana en' + self.formato_bonito(datos[1][1]) + '\\%, según la información de la Encovi 2014.'
+        +'\\% y en el área urbana en ' + self.formato_bonito(datos[1][1]) + '\\%, según la información de la Encovi 2014.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_10.tex'), 'w')
         archivo.write(des)
 
@@ -816,10 +824,10 @@ class Document:
 
     def des_613(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_13.csv'))
-        des = 'A nivel nacional, el índice de severidad de la pobreza se ubicó en 10.6\\% en el 2014 según los datos de la Encovi.\n\n'\
+        des = 'A nivel nacional, el índice de Gini para medir la desigualdad se ubicó en 0.53 en el 2014 según los datos de la Encovi.\n\n'\
         +' Para el caso del departamento de ' + self.lugar_geografico + ', este indicador '\
         +' estuvo por ' + self.encima_debajo(datos[2][1],datos[1][1])\
-        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1]) + '\\%'
+        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1]) 
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_13.tex'), 'w')
         archivo.write(des)
 
@@ -916,6 +924,47 @@ class Document:
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','4_05.tex'), 'w')
         archivo.write(des)
 
+    def des_501(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_01.csv'))
+        des = 'La tasa de participación –la proporción de la población económicamente activa respecto de la población en edad de trabajar- en el departamento de '\
+        + self.lugar_geografico + ' fue de ' + self.formato_bonito(datos[3][1])\
+        +'\\% en el año 2014. \n\n'\
+        +'Este indicador en el año 2006 se situó en ' + self.formato_bonito(datos[1][1])\
+        +'\\%, según datos de la Encovi de ese año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_01.tex'), 'w')
+        archivo.write(des)
+
+    def des_502(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_02.csv'))
+        des = 'Si se desagrega por sexo, la tasa de participación de los hombres es '\
+        + self.mayor_menor(datos[1][1],datos[2][1]) + ' que la de las mujeres. \n\n'\
+        +'Efectivamente, mientras que para los hombres la tasa de participación se situó '\
+        +'en ' + self.formato_bonito(datos[1][1]) + '\\%, para las mujeres el indicador '\
+        +' se ubicó en ' + self.formato_bonito(datos[2][1]) + '\\%.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_02.tex'), 'w')
+        archivo.write(des)
+
+    def des_503(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_03.csv'))
+        des = 'Por área de residencia la Encovi 2014 muestra que la tasa de participación es '\
+        + self.mayor_menor(datos[2][1],datos[1][1]) + ' en las áreas rurales que en las urbanas. \n\n'\
+        +'En efecto, este indicador es de ' + self.formato_bonito(datos[2][1])\
+        +'\\% en el área rural y de '+ self.formato_bonito(datos[1][1])\
+        +'\\% en la urbana.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_03.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_504(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_04.csv'))
+        des = 'Según la legislación nacional y los convenios internacionales en materia de trabajo, no es permitido que los menores de quince años trabajen. \n\n'\
+        +'La Encovi 2014 muestra que en el departamento de ' + self.lugar_geografico\
+        +' el ' + self.formato_bonito(datos[3][1]) + '\\% de niños entre 7 y 14 años llevaban '\
+        +' a cabo una actividad económica; este dato es ' + self.mayor_menor(datos[3][1],datos[1][1])\
+        +' al observado en la encuesta de 2006.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_04.tex'), 'w')
+        archivo.write(des)
+
     def des_505(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_05.csv'))
         des = 'En el departamento de ' + self.lugar_geografico + '  el '\
@@ -924,6 +973,46 @@ class Document:
         +self.formato_bonito(datos[3][1]) + '\\% en los servicios.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_05.tex'), 'w')
         archivo.write(des)
+
+    def des_506(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_07.csv'))
+        des = 'A nivel nacional el 29.1 de la población ocupada  no recibe ninguna remuneración por el trabajo que realiza, según los datos de la Encovi 2014. \n\n'\
+        +' El porcentaje para el departamento es ' + self.mayor_menor(datos[2][1], datos[1][1])\
+        +' que el dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1])+'\\%.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_06.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_507(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_08.csv'))
+        des = 'En el 2014 el ' + self.formato_bonito(datos[3][1]) + '\\% de los '\
+        +' ocupados del departamento de ' + self.lugar_geografico + ' estaban '\
+        +' afilidados al seguro social. \n\n'\
+        +'Este dato es ' + self.mayor_menor(datos[3][1], datos[1][1]) + ' que el '\
+        +' observado en 2006, año en el que la proporción de ocupados con acceso a seguro social '\
+        +' se ubicó en ' + self.formato_bonito(datos[1][1]) + '\\%.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_07.tex'), 'w')
+        archivo.write(des)
+
+    def des_508(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_09.csv'))
+        des = 'Según la Encovi 2014, el ingreso promedio mensual de los ocupados en el primer empleo a nivel nacional fue de Q 2,344.5 en ese año. \n\n'\
+        +'Para el departamento de ' + self.lugar_geografico + ', este indicador se ubicó en '\
+        +'Q.' + self.formato_bonito(datos[2][1]) + ', monto ' + self.mayor_menor(datos[2][1],datos[1][1])\
+        +' que el promedio nacional.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_08.tex'), 'w')
+        archivo.write(des)
+
+
+    def des_509(self):
+        datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_10.csv'))
+        des = 'La tasa de desempleo abierto –que representa el porcentaje de la población económicamente activa que no está ocupada y realiza acciones para conseguir un empleo- se ubicó en 2.4\\% a nivel nacional en el 2014.\n\n'\
+        +'En el departamento de ' + self.lugar_geografico + ' este indicador '\
+        + ' se situó en ' + self.formato_bonito( datos[2][1]) + '\\% para ese mismo '\
+        +'año.'
+        archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_09.tex'), 'w')
+        archivo.write(des)
+
 
     def mas_menos(self,dato1, dato2):
         if float(dato1) > float(dato2):
@@ -1063,4 +1152,12 @@ class Document:
         self.des_403()
         self.des_404()
         self.des_405()
+        self.des_501()
+        self.des_502()
+        self.des_503()
+        self.des_504()
         self.des_505()
+        self.des_506()
+        self.des_507()
+        self.des_508()
+        self.des_509()

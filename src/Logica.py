@@ -84,7 +84,7 @@ class Manejador:
             self.documentos[x].crear_documento()
             self.documentos[x].crear_presentacion()
             self.documentos[x].crear_presentacion_pp()
-            self.documentos[x].compilar_graficas()
+            #self.documentos[x].compilar_graficas()
 
     def leer_tabla(self):
         wb = load_workbook(filename = 'tabla.xlsx')
@@ -256,7 +256,9 @@ class Manejador:
                     subsection = slide.placeholders[16]
                     subsection.text = self.documentos[x].titulo_seccion[y]
                     grafica = slide.placeholders[14]
-                    grafica.insert_picture(os.path.join('/home/hugo/Documents/Departamentos/', self.documentos[x].lugar_geografico, 'graficasPresentacion',  str(contador_capitulos) + '_' + self.formatear_secciones(contador_secciones) + '.png') )
+                    ruta =  os.path.join(self.documentos[x].ruta_salida,'graficasPresentacion', str(contador_capitulos) + '_' + self.formatear_secciones(contador_secciones) + '.png')
+                    print ruta
+                    grafica.insert_picture(ruta)
                     for shape in slide.placeholders:
                         print('%d %s' % (shape.placeholder_format.idx, shape.name))
                     self.documentos[x].escribir_en_presentacion(caja)
