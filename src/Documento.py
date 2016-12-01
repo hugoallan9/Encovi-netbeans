@@ -17,6 +17,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_THEME_COLOR
 from pptx.util import Pt
 import unicodedata
+from pptx.util import Inches
 
 class Document:
 
@@ -170,6 +171,31 @@ class Document:
         p = tf.add_paragraph()
         p.text  = 'Monitorear los avances e impactos de los programas y acciones sociales. '
         p.level = 1
+        title_only_slide_layout = self.prs.slide_layouts[3]
+        slide = self.prs.slides.add_slide(title_only_slide_layout)
+        shapes = slide.shapes
+        shapes.title.text = "Muestra encovi por departamento"
+        rows = 23
+        cols = 4
+        left = top = Inches(2.0)
+        width = Inches(6.0)
+        height = Inches(0.2)
+        table = shapes.add_table(rows, cols, left, top, width, height).table
+
+        # set column widths
+        table.columns[0].width = Inches(1.5)
+        table.columns[1].width = Inches(3.0)
+        table.columns[2].width = Inches(1.5)
+        table.columns[3].width = Inches(3.0)
+
+        # write column headings
+        table.cell(0, 0).text = 'Dominio'
+        table.cell(0, 1).text = 'Departamento'
+        table.cell(0, 2).text = 'UPMS'
+        table.cell(0, 3).text = 'Hogares'
+
+
+
         for shape in slide.placeholders:
             print('%d %s' % (shape.placeholder_format.idx, shape.name))
 
