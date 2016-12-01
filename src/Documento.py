@@ -101,7 +101,7 @@ class Document:
 
     def limpiar_directorio(self):
         for f in os.listdir(self.ruta_salida):
-            if f == self.titulo_documento + '.pdf' or f == self.titulo_documento + '-Presentacion.pdf':
+            if f == self.titulo_documento + '.pdf' or f == self.titulo_documento + '-Presentacion.pdf' or  f == self.titulo_documento + '-Presentacion.pptx'  :
                 pass
             else:
                 print f
@@ -690,7 +690,7 @@ class Document:
     def des_215(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_15.csv'))
         des = 'En el departamento de ' + self.lugar_geografico + ' el porcentaje '\
-        +' de hogares con jefatura femenia e hijos era de ' + self.formato_bonito(datos[2][1])\
+        +' de hogares con jefatura femenina e hijos era de ' + self.formato_bonito(datos[2][1])\
         + '\\%. \n\n' + ' Este indicador en 2006 ascendía a ' + self.formato_bonito(datos[1][1])\
         + '\\% según la Encovi de ese año.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','2_15.tex'), 'w')
@@ -778,7 +778,7 @@ class Document:
         des = ' En el departamento de ' + self.lugar_geografico + ' el '+ self.formato_bonito(datos[1][1]) +'\\% '\
         +' de la población que se autoidentificaba como indígena tenía un consumo '\
         +'por debajo de la línea de pobreza total. \n\n '\
-        +'Para el caso de la población no indígena, el porecentaje de pobreza '\
+        +'Para el caso de la población no indígena, el porcentaje de pobreza '\
         +' total fue de '+ self.formato_bonito(datos[2][1]) + '\\% en 2014.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_05.tex'), 'w')
         archivo.write(des)
@@ -796,7 +796,7 @@ class Document:
     def des_607(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_07.csv'))
         des = ' Para el año 2006, el valor de la línea de pobreza extrema era de Q 3,206. Es importante recordar que la línea de pobreza extrema representa el costo de adquirir la cantidad de calorías mínimas recomendadas para un humano. \n\n'\
-        +'Se puede observar que para 2014, el valor de la línea de pobreza extrema aumentó a Q 5,750 que equivale a un incremento del 79.4% respecto al valor de 2006.'
+        +'Se puede observar que para 2014, el valor de la línea de pobreza extrema aumentó a Q 5,750 que equivale a un incremento del 79.4\\% respecto al valor de 2006.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_07.tex'), 'w')
         archivo.write(des)
 
@@ -1014,7 +1014,7 @@ class Document:
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','5_08.csv'))
         des = 'En el 2014 el ' + self.formato_bonito(datos[3][1]) + '\\% de los '\
         +' ocupados del departamento de ' + self.lugar_geografico + ' estaban '\
-        +' afilidados al seguro social. \n\n'\
+        +' afiliados al seguro social. \n\n'\
         +'Este dato es ' + self.mayor_menor(datos[3][1], datos[1][1]) + ' que el '\
         +' observado en 2006, año en el que la proporción de ocupados con acceso a seguro social '\
         +' se ubicó en ' + self.formato_bonito(datos[1][1]) + '\\%.'
