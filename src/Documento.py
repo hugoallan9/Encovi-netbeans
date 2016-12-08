@@ -171,28 +171,6 @@ class Document:
         p = tf.add_paragraph()
         p.text  = 'Monitorear los avances e impactos de los programas y acciones sociales. '
         p.level = 1
-        title_only_slide_layout = self.prs.slide_layouts[3]
-        slide = self.prs.slides.add_slide(title_only_slide_layout)
-        shapes = slide.shapes
-        shapes.title.text = "Muestra encovi por departamento"
-        rows = 23
-        cols = 4
-        left = top = Inches(2.0)
-        width = Inches(6.0)
-        height = Inches(0.2)
-        table = shapes.add_table(rows, cols, left, top, width, height).table
-
-        # set column widths
-        table.columns[0].width = Inches(1.5)
-        table.columns[1].width = Inches(3.0)
-        table.columns[2].width = Inches(1.5)
-        table.columns[3].width = Inches(3.0)
-
-        # write column headings
-        table.cell(0, 0).text = 'Dominio'
-        table.cell(0, 1).text = 'Departamento'
-        table.cell(0, 2).text = 'UPMS'
-        table.cell(0, 3).text = 'Hogares'
 
 
 
@@ -281,7 +259,7 @@ class Document:
         archivo.write('%Dummy file')
         archivo.close()
         if tipo.strip().upper() == "CUADRO":
-                tex = os.path.isfile( os.path.join(self.ruta_salida, 'graficas',formato + '.tex') )
+                tex = os.path.isfile( os.path.join(self.ruta_salida, 'cuadros',formato + '.tex') )
                 pdf = False
         else:
             tex = os.path.isfile( os.path.join(self.ruta_salida, 'graficas',formato + '.tex') )
@@ -299,7 +277,7 @@ class Document:
             try:
                 if tipo.strip().upper() == "CUADRO":
                     archivo = open(os.path.join(self.ruta_salida, 'cuadros',formato + '.tex'), 'w')
-                    archivo.write('%Dummy file')
+                    archivo.write('%Dummy file ' + str(tex) + str(pdf))
                 else:
                     archivo = open(os.path.join(self.ruta_salida, 'graficas',formato + '.tex'), 'w')
                     archivo.write('%Dummy file')
@@ -381,8 +359,8 @@ class Document:
         des = ' El departamento de ' + self.lugar_geografico + ' está relativamente '\
         + self.mas_menos(datos[2][1],datos[1][1]) + ' poblado que el territorio nacional\n\n'\
         + 'Efectivamente, para 2014 la densidad poblacional del departamento era de '\
-        + self.formato_bonito(datos[2][1]) + ' dato ' + self.mayor_menor(datos[2][1],datos[1][1])\
-        + ' que la densidad a nivel nacional, la que se ubicó en ' + self.formato_bonito(datos[1][1])
+        + self.formato_bonito(datos[2][1]) + ' pesonas por kilómetro cuadrado, dato ' + self.mayor_menor(datos[2][1],datos[1][1])\
+        + ' que la densidad a nivel nacional, la cual se ubicó en ' + self.formato_bonito(datos[1][1])
 
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_05.tex'), 'w')
         archivo.write(des)
@@ -411,7 +389,7 @@ class Document:
         des = 'Debido a que la población menor de edad requiere de una atención especial por parte del Gobierno, es necesario conocer su magnitud para cada departamento.\n\n'\
         +' Para 2014 en el departamento de ' + self.lugar_geografico + ' el '\
         +self.formato_bonito(datos[2][1]) + ' \\% de su población era '\
-        +' que el dato nacional de ' + self.formato_bonito(datos[1][1]) + '\\%'
+        +'menor de edad; este porcentaje es '+ self.mayor_menor(datos[2][1], datos[1][1])+ ' que el dato nacional de ' + self.formato_bonito(datos[1][1]) + '\\%'
 
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_08.tex'), 'w')
         archivo.write(des)
@@ -452,8 +430,8 @@ class Document:
         des = 'Guatemala es un país multilingüe. A nivel nacional un 30\\% de la población aprendió a hablar en un idioma distinto al español, según los datos de la Encovi 2014.\n\n'\
         +' En el departamento de ' + self.lugar_geografico + ', el '\
         +self.formato_bonito(datos[1][1]) + '\\% de la población aprendió a '\
-        + 'hablar en un idioma maya y el ' + self.formato_bonito(datos[2][1])\
-        + ' restante su idioma materno es el español.'
+        + 'hablar en un idioma maya mientras que para el  ' + self.formato_bonito(datos[2][1])\
+        + '\\% restante su idioma materno es el español.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','1_12.tex'), 'w')
         archivo.write(des)
 
@@ -613,7 +591,7 @@ class Document:
 
     def des_205(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','2_05.csv'))
-        des = 'Se sabe que hay algunas enfermedades cuyos vectores se reproducen más fácilmente en cierto tipo de paredes, como el mal de Chagas; por ello es relevante investigar acerca del tipo de material de las paredes en el que habitan los hogares. \n\n'\
+        des = 'El tipo y calidad de los materiales de las paredes de las viviendas también inciden en las condiciones de vida de un hogar.  \n\n'\
         +'En el 2014, el ' + self.formato_bonito(datos[2][1])+ '\\% de hogares del departamento de '\
         +self.lugar_geografico + ' habitaban una casa con paredes de block, '\
         +self.especial1(datos[4][1])
@@ -877,10 +855,9 @@ class Document:
 
     def des_613(self):
         datos = self.leer_csv(os.path.join(self.ruta_salida, 'csv','6_13.csv'))
-        des = 'A nivel nacional, el índice de Gini para medir la desigualdad se ubicó en 0.53 en el 2014 según los datos de la Encovi.\n\n'\
-        +' Para el caso del departamento de ' + self.lugar_geografico + ', este indicador '\
-        +' estuvo por ' + self.encima_debajo(datos[2][1],datos[1][1])\
-        +' del dato nacional al ubicarse en ' + self.formato_bonito(datos[2][1])
+        des = 'A nivel nacional, el índice de Gini para medir la desigualdad se ubicó en 0.5 en el 2014 según los datos de la Encovi.\n\n'\
+        +' Para el caso del departamento de ' + self.lugar_geografico + ', este indicador ' + self.encima_debajo_especial(datos[2][1],datos[1][1])\
+        +' del dato nacional y  ubicarse en ' + self.formato_bonito(datos[2][1])
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','6_13.tex'), 'w')
         archivo.write(des)
 
@@ -1013,7 +990,7 @@ class Document:
         des = 'Según la legislación nacional y los convenios internacionales en materia de trabajo, no es permitido que los menores de quince años trabajen. \n\n'\
         +'La Encovi 2014 muestra que en el departamento de ' + self.lugar_geografico\
         +' el ' + self.formato_bonito(datos[3][1]) + '\\% de niños entre 7 y 14 años llevaban '\
-        +' a cabo una actividad económica; este dato es ' + self.mayor_menor(datos[3][1],datos[1][1])\
+        +' a cabo una actividad económica; este dato es ' + self.mayor_menor(datos[1][1],datos[3][1])\
         +' al observado en la encuesta de 2006.'
         archivo = open( os.path.join(self.ruta_salida, 'descripciones','5_04.tex'), 'w')
         archivo.write(des)
@@ -1089,9 +1066,9 @@ class Document:
 
     def especial(self, dato):
         if float(dato) > 1:
-            return 'mientras que el '+self.formato_bonito(dato) + '\\% poseen casas con techo de paja, palma o de un material similar. '
+            return ' mientras que el '+self.formato_bonito(dato) + '\\% poseen casas con techo de paja, palma o de un material similar. '
         else:
-           return 'mientras que casi ningún hogar posee vivienda con techo de paja, palma o de un material similar.'
+           return ' mientras que casi ningún hogar posee vivienda con techo de paja, palma o de un material similar.'
 
     def especial1(self, dato):
         if float(dato) > 1:
@@ -1101,9 +1078,9 @@ class Document:
 
     def formato_bonito(self, numero):
         if float(numero) < 1:
-            return "{:,}".format(round(float(numero),2))
+            return "{:,}".format(round(float(numero),1))
         else:
-            return "{:,}".format(round(float(numero),2)).strip('0').strip('.')
+            return "{:,}".format(round(float(numero),1)).strip('0').strip('.')
 
     def cambio(self, dato1, dato2):
         dato1 = float(dato1)
@@ -1136,6 +1113,14 @@ class Document:
             return ' encima '
         elif(dato1 < dato2):
             return ' debajo '
+        else:
+            return ' igual '
+
+    def encima_debajo_especial(self,dato1,dato2):
+        if dato1 > dato2:
+            return ' se ubicó por arriba del dato nacional, al diferir en ' + self.formato_bonito(float(dato1) - float(dato2))
+        elif(dato1 < dato2):
+            return ' se ubicó por debajo del dato nacional, al diferir en ' + self.formato_bonito(float(dato2) - float(dato1))
         else:
             return ' igual '
 
